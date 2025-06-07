@@ -69,7 +69,8 @@ Tautan dataset: https://www.kaggle.com/datasets/arashnic/book-recommendation-dat
    * Jumlah Pengarang:  102023
    * Banyak Tahun Terbit:  202
    * Jumlah Penerbit:  16808
-3. Visualisasi top 10 author yang menunjukkan 10 pengarang dengan jumlah buku terbanyak
+3. Visualisasi bar chart top 10 author yang menunjukkan 10 pengarang dengan jumlah buku terbanyak
+![image alt](https://github.com/najwatdp/submission-sr/blob/c83a3e210f17c8e05b03eba3e9b5750c2d619110/top10_author.png)
    Berikut top 10 author:
    * Agatha Christie
    * William Shakespeare
@@ -90,6 +91,65 @@ Tautan dataset: https://www.kaggle.com/datasets/arashnic/book-recommendation-dat
    * Jumlah buku yang dirating:  340556
    * Jumlah data rating:  1149780
 
+Cek missing value pada data merge books_rat dengan isnull().sum(). Jumlah nilai null tiap fitur:
+  * ISBN: 0
+  * Book-Title: 0
+  * Book-Author: 2
+  * Year-Of-Publication: 4
+  * Publisher: 2
+  * Image-URL-S: 0
+  * Image-URL-M: 0
+  * Image-URL-L: 4
+  * User-ID: 1209
+  * Book-Rating: 1209
+
+Cek nilai duplikat data merge books_rat dengan duplicated().sum(): Tidak terdapat nilai duplikat
+
 Tidak melakukan eksplorasi data terhadap users.csv karena dalam content based filtering hanya menggunakan books.csv dan ratings.csv.
 
 ## Data Preparation
+1. Menggabungkan books dengan ratings berdasarkan ISBN
+
+   Proses: Menggunakan metode merge() dengan on='ISBN'.
+
+   Alasan: Agar setiap entri buku memiliki informasi rating yang terkait, sehingga bisa digunakan dalam proses pemodelan atau evaluasi sistem rekomendasi.
+2. Mengubah tipe data Year-Of-Publication menjadi tipe numerik
+
+   Proses: Menggunakan metode pd.to_numeric dengan errors='coerce'
+
+   Alasan: Entri tahun berisi teks sehingga perlu dikonversi agar dapat diolah (misalnya digunakan sebagai fitur atau filter). errors='coerce' akan menjadikan nilai tidak valid sebagai NaN.
+3. Hapus baris yang mengandung missing value
+
+   Proses: Menggunakan metose dropna(). Menghapus semua baris yang memiliki nilai kosong pada salah satu kolom.
+
+   Alasan: Nilai kosong dapat menyebabkan error pada proses berikutnya, terutama saat melakukan transformasi atau perhitungan seperti cosine similarity.
+4. Drop fitur yang tidak digunakan
+
+   Proses: Menggunakan metode drop() pada fitur Image-URL-S, Image-URL-M, dan Image-URL-L
+
+   Alasan: Untuk menyederhanakan data dan fokus pada fitur penting seperti Book-Title, Book-Author, rating, dan ISBN. Fitur gambar atau URL tidak digunakan dalam content-based filtering.
+5. Mengubah tipe data Year-Of-Publication menjadi integer
+
+   Proses: Menggunakan metode astype(int)
+
+   Alasan: Untuk menampilkan tipe data tahun yang seharusnya, bukan float tetapi integer.
+6. Mengurutkan data berdasarkan ISBN
+
+   Proses: Menggunakan metode sort_values by='ISBN' dan ascending=True.
+
+   Alasan: Pengurutan membantu dalam proses debugging, pencarian duplikat, atau validasi data, terutama ketika akan dilakukan penghapusan duplikat.
+7. Menghapus baris yang mengandung ISBN duplikat
+
+   Proses: Menggunakan metode drop_duplicates dengan subset='ISBN'
+
+   Alasan: Untuk memastikan setiap buku hanya muncul satu kali dalam dataset. Duplikasi dapat menyebabkan bias dalam sistem rekomendasi.
+8. Mengubah tipe data ke bentuk list
+
+   Proses: Menggunakan metode tolist() untuk mengubah tipe data menjadi list.
+
+   Alasan: List digunakan untuk mapping dan encoding ke format numerik dalam proses pembuatan model rekomendasi
+9. Membuat dataframe baru dan mengambil 20000 data pertama
+
+   Proses: Menggunakan pd.DataFrame untuk mebuat dataframe baru dari list yang sudah dibuat dan [:20000] untuk mengambil 20000 data pertama pada dataframe.
+
+   Alasan: Untuk efisiensi pemrosesan dan pelatihan model. Dataset asli sangat besar, sehingga sampling dilakukan untuk mempercepat proses eksplorasi, pelatihan, dan evaluasi tanpa mengurangi representasi data secara signifikan.
