@@ -2,8 +2,94 @@
 
 ## Project Overview
 ### Latar Belakang
-Menyertakan referensi
-### Mengapa Proyek Ini Penting Untuk Diselesaikan
-### Bagaimana Proyek Ini Diselesaikan
+Di era digital yang terus berkembang, jumlah koleksi buku yang tersedia secara daring semakin melimpah. Hal ini memberikan keleluasaan bagi pembaca untuk memilih literatur sesuai minatnya, namun juga memunculkan tantangan baru yaitu cara menemukan buku yang paling relevan dan sesuai dengan preferensi pengguna secara cepat dan efisien. Dalam konteks ini, sistem rekomendasi buku menjadi solusi penting.
+
+Salah satu pendekatan yang umum digunakan dalam sistem rekomendasi adalah content-based filtering, yakni metode yang merekomendasikan item berdasarkan kemiripan atribut konten antar item. Dalam konteks buku, atribut tersebut dapat berupa judul, penulis, genre, sinopsis, hingga kata kunci. Content-based filtering memungkinkan sistem memberikan rekomendasi yang personal karena disesuaikan dengan karakteristik buku yang pernah disukai atau dibaca oleh pengguna sebelumnya.
+
+Berdasarkan penelitian yang dilakukan oleh Upreti *dkk* (2025), sistem rekomendasi berbasis konten dapat ditingkatkan performanya dengan menggunakan teknik representasi vektor dan metrik kesamaan seperti cosine similarity. Mereka menyatakan bahwa pendekatan ini efektif dalam menyusun daftar buku yang memiliki karakteristik serupa, sekaligus mampu beradaptasi terhadap preferensi individual pengguna.
+
+Penelitian tersebut juga menunjukkan bahwa meskipun content-based filtering memiliki keterbatasan, integrasinya dalam sistem rekomendasi, baik secara tunggal maupun sebagai bagian dari pendekatan hybrid, mampu memberikan hasil yang cukup akurat dalam mempersonalisasi rekomendasi. Oleh karena itu, pengembangan sistem rekomendasi buku berbasis content-based filtering tetap relevan dan signifikan, terutama jika dioptimalkan dengan preprocessing data yang tepat, pemilihan fitur yang informatif, dan penggunaan algoritma pemodelan kesamaan antar item yang efisien.
+
 ### Hasil Riset Referensi
-Referensi:
+Penelitian yang dilakukan oleh Upreti *dkk* (2025) membuktikan bahwa sistem rekomendasi berbasis content-based filtering menjadi metode yang efektif dalam memberikan rekomendasi buku kepada pengguna berdasarkan karakteristik konten buku yang telah mereka baca atau sukai sebelumnya.
+
+Penelitian ini membangun sistem rekomendasi menggunakan pendekatan TF-IDF (Term Frequency-Inverse Document Frequency) untuk merepresentasikan fitur dari setiap buku, khususnya pada bagian judul dan metadata. Setelah fitur vektor dari tiap buku diperoleh, sistem menggunakan cosine similarity untuk mengukur tingkat kemiripan antar buku. Semakin tinggi nilai cosine similarity antara dua vektor buku, semakin besar kemungkinan sistem akan merekomendasikannya kepada pengguna.
+
+Pengujian dilakukan pada dataset yang memuat judul buku dan informasi terkait lainnya. Hasil pengujian menunjukkan bahwa metode ini dapat menghasilkan rekomendasi yang cukup relevan, terutama untuk pengguna yang telah memiliki histori bacaan sebelumnya. Dalam percobaan yang dilakukan, sistem mampu menyarankan buku-buku yang secara semantik memiliki keterkaitan dengan buku input dari pengguna.
+
+Selain keunggulan tersebut, penelitian ini juga mengidentifikasi beberapa keterbatasan dari pendekatan content-based filtering, antara lain:
+- Kurangnya keberagaman (over-specialization): sistem cenderung merekomendasikan buku-buku yang sangat mirip dengan buku sebelumnya, sehingga eksplorasi buku baru menjadi terbatas.
+- Masalah cold start: sistem kesulitan memberikan rekomendasi untuk pengguna baru (yang belum memiliki riwayat bacaan) atau buku baru (yang belum memiliki cukup informasi).
+- Ketergantungan pada kualitas data konten: sistem sangat tergantung pada informasi metadata (judul, penulis, deskripsi) untuk menghasilkan rekomendasi yang akurat.
+
+Referensi: Upreti *dkk*. (2025). A Book Tracking and Recommender System using Machine Learning Algorithms. *International Journal for Research in Applied Science & Engineering Technology (IJRASET)*, 13(5), 2377-2385. https://doi.org/10.22214/ijraset.2025.70694
+
+### Mengapa Proyek Ini Penting Untuk Diselesaikan
+1. Membantu pengguna menemukan buku yang sesuai dengan preferensinya. Dengan semakin banyaknya pilihan buku yang tersedia secara daring, pengguna sering kali merasa kewalahan dalam menentukan bacaan yang tepat. Proyek sistem rekomendasi ini bertujuan untuk menyederhanakan proses tersebut dengan menyajikan daftar buku yang paling relevan berdasarkan buku yang pernah dibaca atau disukai pengguna. Hal ini menjadikan pengalaman mencari buku lebih personal, efisien, dan menyenangkan.
+2. Meningkatkan efisiensi sistem pencarian buku. Tanpa sistem rekomendasi, pengguna harus menggunakan fitur pencarian manual yang terbatas pada kata kunci tertentu, yang belum tentu mencerminkan keseluruhan minat mereka. Dengan memanfaatkan content-based filtering, sistem dapat mengidentifikasi kemiripan antar buku dan secara otomatis menyarankan bacaan yang relevan, sehingga mengurangi waktu pencarian dan meningkatkan akurasi hasil yang diberikan.
+3. Memberikan personalisasi dalam pengalaman membaca. Personalisasi merupakan salah satu kunci utama dalam meningkatkan keterlibatan dan kepuasan pengguna. Sistem rekomendasi dalam proyek ini secara otomatis menyesuaikan saran buku berdasarkan pola preferensi unik tiap individu, bukan hanya berdasarkan buku populer secara umum. Ini memungkinkan setiap pengguna memperoleh pengalaman yang berbeda dan lebih sesuai dengan kebutuhannya masing-masing.
+4. Menjadi dasar pengembangan sistem hybrid yang lebih kompleks. Content-based filtering dapat dijadikan sebagai pondasi awal untuk membangun sistem rekomendasi yang lebih kompleks, seperti pendekatan hybrid yang menggabungkan content-based dan collaborative filtering. Dengan menyelesaikan proyek ini, diperoleh kerangka kerja yang bisa dikembangkan lebih lanjut untuk menangani berbagai tantangan seperti cold-start problem atau over-specialization, yang umum terjadi dalam sistem rekomendasi.
+
+### Bagaimana Proyek Ini Diselesaikan
+1. Pengumpulan dan Persiapan Dataset. Dataset yang digunakan diperoleh dari Kaggle, yaitu Book Recommendation Dataset yang terdiri atas tiga file utama: Books.csv, Ratings.csv, dan Users.csv. Dataset tersebut mencakup informasi judul buku, ISBN, nama pengarang, penerbit, tahun terbit, serta data rating yang diberikan oleh pengguna terhadap buku-buku tersebut.
+2. Eksplorasi dan Pembersihan Data. Data dari masing-masing file dibaca menggunakan pustaka pandas. Kemudian dilakukan eksplorasi awal terhadap jumlah ISBN unik, pengguna, serta karakteristik buku seperti jumlah pengarang dan penerbit. Selain itu, dilakukan pembersihan data seperti penghapusan data duplikat dan konversi kolom tahun terbit ke tipe numerik (int) untuk menghindari error pemrosesan.
+3. Pemilihan dan Representasi Fitur Buku. Dalam pendekatan content-based filtering, fitur yang digunakan untuk merepresentasikan buku adalah Book-Author. Fitur ini kemudian diubah menjadi vektor numerik menggunakan teknik TF-IDF (Term Frequency–Inverse Document Frequency) melalui TfidfVectorizer dari Scikit-Learn. Teknik ini menghasilkan matriks TF-IDF yang menggambarkan pentingnya kata dalam konteks seluruh koleksi buku.
+4. Perhitungan Kemiripan Antar Buku. Setelah mendapatkan representasi vektor buku, dilakukan perhitungan kemiripan antar buku menggunakan cosine similarity. Matriks kemiripan yang dihasilkan digunakan untuk menentukan tingkat kesamaan antara satu buku dengan buku lainnya berdasarkan informasi penulis.
+5. Pembangunan Sistem Rekomendasi Buku. Sistem rekomendasi dibangun dengan memanfaatkan hasil cosine similarity. Untuk buku yang telah dibaca pengguna, sistem akan merekomendasikan buku lain yang memiliki nilai kemiripan tertinggi. Proses ini dibungkus dalam fungsi book_recommendation() yang mampu memberikan daftar buku mirip berdasarkan input judul buku tertentu.
+6. Visualisasi dan Validasi Output Rekomendasi. Proyek juga mencakup pembuatan visualisasi seperti distribusi rating dan analisis pengguna aktif, serta menampilkan output rekomendasi yang dihasilkan. Selain itu, sistem memeriksa kondisi khusus, seperti pengguna yang telah membaca semua buku dalam dataset, guna menghindari error saat prediksi.
+
+## Business Understanding
+### Problem Statements
+1. Bagaimana membangun sistem rekomendasi buku yang mampu memberikan saran bacaan yang relevan kepada pengguna berdasarkan konten buku? Banyaknya pilihan buku dalam platform digital seringkali menyulitkan pengguna dalam menemukan bacaan yang sesuai dengan minat mereka. Diperlukan sistem yang dapat membantu pengguna menavigasi pilihan tersebut berdasarkan karakteristik konten buku.
+2. Bagaimana cara merepresentasikan informasi konten buku dalam bentuk fitur numerik agar dapat dibandingkan satu sama lain secara otomatis? Untuk menerapkan content-based filtering, perlu dilakukan proses ekstraksi fitur seperti nama pengarang atau judul buku yang selanjutnya dapat dikonversi ke bentuk numerik menggunakan metode seperti TF-IDF.
+3. Bagaimana mengukur tingkat kemiripan antar buku secara akurat agar sistem dapat memberikan rekomendasi yang tepat? Sistem perlu menerapkan metrik kesamaan (similarity) yang efektif, seperti cosine similarity, agar dapat mengidentifikasi buku yang paling mirip dengan preferensi pengguna sebelumnya.
+### Goals
+1. Membangun sistem rekomendasi buku berbasis konten. Tujuan utama dari proyek ini adalah membangun sistem yang dapat merekomendasikan buku kepada pengguna berdasarkan konten buku itu sendiri, seperti judul atau nama pengarang. Ini menjawab kebutuhan pengguna dalam menemukan bacaan yang sesuai tanpa harus bergantung pada popularitas atau rating dari pengguna lain.
+2. Mengekstraksi dan merepresentasikan informasi konten dalam bentuk vektor numerik. Sistem dirancang untuk mengubah informasi teks (seperti nama pengarang) menjadi bentuk numerik menggunakan metode TF-IDF (Term Frequency–Inverse Document Frequency). Representasi ini memungkinkan sistem untuk mengukur hubungan antar buku secara matematis.
+3. Mengimplementasikan pengukuran kemiripan antar buku menggunakan cosine similarity. Proyek ini bertujuan untuk menghitung tingkat kemiripan antar buku berdasarkan vektor kontennya, dengan menggunakan cosine similarity sebagai metrik utama. Metrik ini membantu sistem menentukan buku yang paling mirip untuk direkomendasikan.
+### Solution Statements
+1. Untuk membangun sistem rekomendasi buku berbasis konten, solusi yang diterapkan adalah dengan menggunakan pendekatan content-based filtering, di mana sistem merekomendasikan buku berdasarkan kesamaan konten antar buku. Implementasi dimulai dengan memilih fitur penting dari buku, seperti judul atau nama pengarang, lalu membandingkannya untuk menemukan buku yang paling relevan bagi pengguna.
+2. Untuk mengekstraksi dan merepresentasikan informasi konten dalam bentuk vektor numerik, sistem memanfaatkan teknik Term Frequency–Inverse Document Frequency (TF-IDF). Teknik ini digunakan untuk mengubah data teks (contohnya: nama pengarang) menjadi representasi angka dalam bentuk matriks TF-IDF, yang dapat diproses secara komputasional. Hasil representasi ini akan digunakan sebagai dasar dalam penghitungan kemiripan antar buku.
+3. Untuk mengimplementasikan pengukuran kemiripan antar buku menggunakan cosine similarity, sistem melakukan komputasi cosine similarity terhadap vektor TF-IDF dari seluruh buku. Cosine similarity digunakan karena kemampuannya dalam mengukur sudut antar vektor dan menentukan tingkat kemiripan antar dua item teks, terlepas dari panjang dokumennya. Buku dengan nilai similarity tertinggi terhadap buku yang telah dibaca pengguna akan dipilih sebagai rekomendasi.
+
+## Data Understanding
+Dataset yang digunakan dalam proyek ini berasal dari Kaggle yang terdiri dari tiga file utama:
+1. Books.csv: Setiap buku diidentifikasi berdasarkan ISBN masing-masing. File ini memiliki 8 fitur yang memberikan informasi setiap buku. Fitur-fitur yang tersedia yaitu ISBN buku (ISBN), judul buku (Book-Title), pengarang buku (Book-Author), tahun terbit buku (Year-Of-Publication), penerbit buku (Publisher), gambar buku ukuran kecil (Image-URL-S), gambar buku ukuran sedang (Image-URL-M), dan gambar buku ukuran besar (Image-URL-L)
+2. Ratings.csv: Berisi informasi tentang peringkat atau penilaian buku yang diberikan oleh pengguna berskala 1-10. File ini memiliki 3 fitur, yaitu ID pengguna (User-ID), identitas buku berupa ISBN (ISBN), dan penialian buku dari pengguna (Book-Rating).
+3. Users.csv: Berisi informasi mmengenai pengguna. Terdiri dari 3 fitur, yaitu ID pengguna (User-ID), lokasi pengguna (Location), dan usia pengguna (Age).
+
+Tautan dataset: https://www.kaggle.com/datasets/arashnic/book-recommendation-dataset/data
+
+### Exploratory Data Understanding
+**A. Book Variabel**
+1. books.info(): Memberikan informasi mengenai file books.csv. Seluruh fitur memiliki tipe object.
+2. len(books.Fitur.unique()): Menghitung jumlah data tiap nilai unique setiap fitur. Hasilnya berupa:
+   * Banyak data buku:  271360
+   * Jumlah Judul Buku:  242135
+   * Jumlah Pengarang:  102023
+   * Banyak Tahun Terbit:  202
+   * Jumlah Penerbit:  16808
+3. Visualisasi top 10 author yang menunjukkan 10 pengarang dengan jumlah buku terbanyak
+   Berikut top 10 author:
+   * Agatha Christie
+   * William Shakespeare
+   * Stephen King
+   * Ann M. Martin
+   * Carolyn Keene
+   * Francine Pascal
+   * Isaac Asimov
+   * Nora Roberts
+   * Barbara Cartland
+   * Charles Dickens
+
+**B. Rating Variabel**
+1. ratings.info(): Memberikan informasi mengenai file ratings.csv. Terdapat 2 fiutr bertipe integer dan 1 fitur bertipe object.
+2. ratings.describe(): Memberikan analisis deskriptif terhadap fitur integer. Rating berskala 0-10, dengan minimal rating yaitu 0 dan maksimal rating yaitu 10.
+3. len(ratings.Fitur.unique()): Menghitung jumlah data tiap nilai unique setiap fitur. Hasilnya berupa:
+   * Jumlah pengguna yang memberikan rating:  105283
+   * Jumlah buku yang dirating:  340556
+   * Jumlah data rating:  1149780
+
+Tidak melakukan eksplorasi data terhadap users.csv karena dalam content based filtering hanya menggunakan books.csv dan ratings.csv.
+
+## Data Preparation
