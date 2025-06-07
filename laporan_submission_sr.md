@@ -153,3 +153,92 @@ Tidak melakukan eksplorasi data terhadap users.csv karena dalam content based fi
    Proses: Menggunakan pd.DataFrame untuk mebuat dataframe baru dari list yang sudah dibuat dan [:20000] untuk mengambil 20000 data pertama pada dataframe.
 
    Alasan: Untuk efisiensi pemrosesan dan pelatihan model. Dataset asli sangat besar, sehingga sampling dilakukan untuk mempercepat proses eksplorasi, pelatihan, dan evaluasi tanpa mengurangi representasi data secara signifikan.
+
+## Modeling dengan Content Based Filtering dan Result
+Sistem rekomendasi yang dikembangkan dalam proyek ini menggunakan pendekatan content-based filtering, yang berarti sistem menyarankan buku kepada pengguna berdasarkan kemiripan konten antar buku, bukan berdasarkan interaksi antar pengguna. Implementasi model dilakukan melalui tiga komponen utama, yaitu:
+1. TF-IDF Vectorizer
+   
+   TF-IDF (Term Frequency–Inverse Document Frequency) digunakan untuk mengubah fitur teks (dalam proyek ini: nama pengarang/'author') menjadi bentuk numerik (vektor). Setiap kata dalam nama pengarang akan dihitung bobotnya berdasarkan frekuensinya dalam satu buku dan seberapa umum kata tersebut muncul di keseluruhan data. Representasi vektor hasil TF-IDF ini digunakan untuk menghitung seberapa mirip dua buku berdasarkan penulisnya. Semakin mirip vektor dua buku, semakin besar kemungkinan sistem akan merekomendasikan salah satunya.
+   
+   Objek TfidfVectorizer dari pustaka Scikit-Learn diinisialisasi untuk memproses teks yang akan diubah menjadi representasi vektor. Objek ini bertanggung jawab melakukan tokenisasi, menghitung TF dan IDF, dan membentuk matriks TF-IDF. Kemudian dilakukan pelatihan awal (fit) pada data teks dari kolom author. Proses ini menghitung nilai IDF untuk setiap token (kata) unik dalam korpus Book-Author. Tujuannya adalah untuk mengetahui seberapa penting suatu kata dalam keseluruhan kumpulan data. Selanjutnya, ditampilkan daftar fitur atau kata unik yang dihasilkan dari proses tokenisasi Book-Author. Setiap kata akan menjadi kolom dalam matriks TF-IDF.
+
+   Setelah proses fit, data teks kemudian diubah menjadi bentuk matriks TF-IDF. Matriks ini memiliki dimensi (jumlah_buku × jumlah_kata_unik), di mana setiap sel berisi bobot TF-IDF dari kata tertentu untuk masing-masing buku (berdasarkan nama pengarang). Matriks TF-IDF hasil transformasi awal berbentuk sparse matrix. Untuk keperluan analisis atau visualisasi, sparse matrix diubah ke bentuk dense agar setiap elemen dapat ditampilkan secara eksplisit. Kemudian, dibuat dataframe agar lebih mudah dalam melakukan eksplorasi dan interpretasi terhadap matriks TF-IDF. Kolom diisi dengan penulis buku dan baris diisi dengan judul buku.
+   
+2. Cosine Similarity
+
+   Cosine similarity digunakan untuk mengukur tingkat kemiripan antara dua vektor TF-IDF. Nilai cosine similarity berkisar antara 0 (tidak mirip) hingga 1 (sangat mirip). Semakin tinggi nilainya, semakin mirip konten dua buku tersebut. Matriks cosine similarity menjadi dasar dalam menyusun daftar rekomendasi. Untuk setiap buku yang dipilih pengguna, sistem akan mengambil buku-buku lain dengan skor kemiripan tertinggi.
+
+   Fungsi cosine_similarity dari sklearn.metrics.pairwise digunakan untuk menghitung nilai kemiripan antar semua pasangan buku berdasarkan vektor TF-IDF hasil representasi konten (dalam proyek ini menggunakan 'author). Nilai ini menjadi dasar untuk menyusun daftar buku yang mirip, sehingga dapat direkomendasikan kepada pengguna. Matriks hasil cosine similarity dikonversi menjadi DataFrame untuk mempermudah akses dan manipulasi data. Baris dan kolom dari DataFrame diisi dengan nama judul buku (book_title) dan nilai antar sel menunjukkan tingkat kemiripan antara dua buku tertentu.
+   
+3. Mendapatkan Rekomendasi
+
+   Setelah matriks kemiripan antar buku berhasil dibentuk menggunakan pendekatan cosine similarity, langkah selanjutnya dalam sistem rekomendasi adalah menghasilkan daftar buku yang paling mirip dengan buku tertentu yang dijadikan input oleh pengguna. Untuk itu, sistem menggunakan fungsi book_recommendation(), yang bekerja berdasarkan perhitungan skor kemiripan konten antar buku. Fungsi ini menerima input berupa judul buku dan akan mengembalikan beberapa rekomendasi buku lain yang paling mirip.
+
+   Fungsi book_recommendation() diinisialisasi dengan tiga parameter utama, yaitu book_title sebagai input judul buku, similarity_data sebagai matriks cosine similarity antar buku, dan items sebagai subset dari data utama yang berisi informasi judul dan penulis buku. Selain itu, parameter k digunakan untuk menentukan jumlah buku yang akan direkomendasikan (dalam proyek ini k=5).
+   
+   Fungsi akan mengekstrak kolom kemiripan dari buku input menggunakan metode .loc[:, book_title], lalu mengubahnya ke bentuk array numerik (NumPy). Proses ini memungkinkan sistem untuk menghitung indeks dari buku-buku dengan skor kemiripan tertinggi terhadap buku acuan. Untuk mempercepat proses, digunakan metode argpartition, yang secara efisien memilih indeks k buku dengan kemiripan tertinggi tanpa harus mengurutkan seluruh nilai kemiripan.
+
+   Setelah indeks diperoleh, fungsi mengambil daftar judul buku yang memiliki nilai cosine similarity tertinggi terhadap buku input. Pengambilan ini disusun dari skor tertinggi ke yang lebih rendah. Untuk menghindari duplikasi, nama buku yang digunakan sebagai input akan dihapus dari daftar rekomendasi menggunakan metode .drop().
+
+   Langkah terakhir adalah membentuk DataFrame dari daftar hasil rekomendasi, lalu menggabungkannya dengan informasi judul dan nama pengarang dari data utama. Hasil akhir adalah daftar k judul buku yang paling mirip berdasarkan konten (penulis), yang kemudian ditampilkan sebagai rekomendasi kepada pengguna.
+
+   Sebagai contoh, ketika fungsi dijalankan dengan input 'The Boy Next Door', sistem akan mencari dan menampilkan lima buku lain yang memiliki penulis dengan karakteristik paling mirip berdasarkan skor cosine similarity yang dihitung dari representasi TF-IDF.
+
+5 rekomendasi buku yang mirip dengan "The Boy Next Door"
+
+| Book_Title | author |
+| --- | --- |
+| She Went All The Way (Avon Light Contemporary Romances) | Meggin Cabot |
+| All-American Girl | Meg Cabot |
+| All-American Girl | Meg Cabot |
+| Princess in Love (The Princess Diaries, Vol. 3) | Meg Cabot |
+| Princess in Love (The Princess Diaries, Vol. 3) | Meg Cabot |
+
+**Kelebihan Content Based Filtering:**
+1. Personalisasi Tinggi. Content-based filtering memberikan hasil rekomendasi yang spesifik untuk setiap pengguna berdasarkan item yang sebelumnya mereka sukai. Sistem ini belajar dari minat individu tanpa perlu bergantung pada preferensi pengguna lain.
+2. Tidak Membutuhkan Interaksi Antar Pengguna. Sistem dapat berfungsi meskipun hanya tersedia satu pengguna, karena rekomendasi dihasilkan berdasarkan konten item, bukan hubungan antar pengguna. Hal ini sangat berguna dalam situasi dengan jumlah pengguna terbatas atau belum banyak interaksi.
+3. Rekomendasi yang Konsisten. Karena sistem hanya mempertimbangkan konten item, maka rekomendasi yang diberikan bersifat stabil dan tidak bergantung pada perubahan perilaku pengguna lain. Ini menghasilkan saran yang lebih dapat diprediksi dan sesuai dengan preferensi awal pengguna.
+4. Dapat Merekomendasikan Item Baru. Selama informasi konten tersedia, sistem dapat memberikan rekomendasi terhadap item baru meskipun belum memiliki rating dari pengguna lain. Hal ini mengurangi dampak cold-start pada item baru.
+
+**Kekurangan Content Based Learning:**
+1. Over-Specialization (Kurangnya Keberagaman). Sistem cenderung merekomendasikan item yang sangat mirip dengan yang telah disukai pengguna, sehingga kemungkinan mengeksplorasi genre atau konten baru menjadi terbatas. Hal ini dapat membuat rekomendasi terasa monoton dan kurang variatif.
+2. Bergantung pada Kualitas Data Konten. Efektivitas sistem sangat dipengaruhi oleh kualitas dan kelengkapan atribut konten seperti nama pengarang, genre, atau sinopsis. Jika data konten tidak lengkap atau tidak konsisten, maka hasil rekomendasi juga akan menjadi kurang akurat.
+3. Cold Start pada Pengguna Baru. Jika pengguna baru belum memiliki histori interaksi atau belum membaca buku apa pun, sistem tidak memiliki dasar untuk mempelajari preferensinya. Hal ini membuat sistem kesulitan memberikan rekomendasi yang relevan untuk pengguna baru.
+4. Tidak Mampu Menangkap Preferensi Kolektif. Content-based filtering tidak memanfaatkan informasi dari pengguna lain. Akibatnya, sistem tidak dapat merekomendasikan item yang sedang populer atau disukai oleh pengguna dengan minat serupa.
+
+## Evaluation
+Evaluasi sistem rekomendasi berbasis content-based filtering bertujuan untuk mengukur seberapa akurat sistem dalam mengidentifikasi buku-buku yang dianggap relevan berdasarkan kemiripan konten. Dalam proyek ini, evaluasi dilakukan dengan cara membandingkan skor kemiripan antar buku (cosine similarity) terhadap nilai ground truth yang dibentuk berdasarkan ambang batas tertentu (threshold).
+
+Tahapan Evaluasi:
+1. Menentukan Threshold Kemiripan: Nilai ambang (threshold) sebesar 0.5 ditetapkan untuk mengkategorikan apakah dua buku dianggap mirip (1) atau tidak mirip (0) berdasarkan skor cosine similarity mereka. Threshold 0.5 dipilih sebagai titik tengah standar karena skor cosine similarity berkisar antara 0 (tidak mirip) hingga 1 (identik). Dengan ambang ini, setiap pasangan buku yang memiliki similarity ≥ 0.5 dianggap relevan.
+2. Membentuk Ground Truth Matrix: Dibuat matriks ground truth dengan membandingkan seluruh nilai cosine similarity terhadap threshold. Hasilnya berupa matriks biner yang menunjukkan hubungan kemiripan antar buku. Ground truth ini digunakan sebagai acuan kebenaran (true label) saat mengevaluasi prediksi dari model.
+3. Sampling Data Evaluasi: Karena ukuran matriks cosine similarity dan ground truth sangat besar, dilakukan sampling sebanyak 10.000 x 10.000 untuk menghindari kelebihan penggunaan memori (RAM). Ukuran ini cukup besar untuk representatif, namun cukup kecil agar tetap efisien dalam perhitungan.
+4. Konversi Matriks ke Bentuk 1 Dimensi: Agar dapat dibandingkan langsung menggunakan metrik klasifikasi (precision, recall, f1), kedua matriks dikonversi menjadi array 1 dimensi.
+5. Membuat Prediksi Berdasarkan Threshold: Array prediksi dibuat dengan cara membandingkan nilai similarity terhadap threshold yang sama (0.5). Hasilnya berupa array prediksi biner.
+6. Menghitung Metrik Evaluasi: Evaluasi terhadap sistem rekomendasi berbasis content-based filtering dilakukan dengan menggunakan tiga metrik utama, yaitu precision, recall, dan F1-score. Ketiga metrik ini digunakan untuk mengukur seberapa baik sistem mengenali item (buku) yang relevan untuk direkomendasikan kepada pengguna. Berdasarkan hasil evaluasi pada subset data dengan ukuran 10.000 × 10.000, diperoleh nilai sebagai berikut:
+   - Precision: 1.0
+   - Recall: 1.0
+   - F1-score: 1.0
+   
+   Hal ini menunjukkan bahwa:
+   - Semua pasangan buku yang direkomendasikan oleh sistem adalah benar-benar mirip (precision sempurna).
+   - Semua pasangan buku yang seharusnya direkomendasikan berhasil dikenali oleh sistem (recall sempurna).
+   - Kombinasi dari precision dan recall menghasilkan sistem yang sangat akurat (F1-score sempurna).
+
+**Formula dan cara kerja metrik evaluasi:**
+1. Precision = TP / (TP + FP)
+
+   - TP (True Positive): jumlah pasangan buku yang memang mirip dan diprediksi mirip
+   - FP (False Positive): jumlah pasangan buku yang diprediksi mirip, tetapi sebenarnya tidak mirip
+
+   Precision mengukur proporsi prediksi positif yang benar-benar relevan. Dalam konteks sistem rekomendasi, precision menunjukkan seberapa banyak dari buku-buku yang direkomendasikan oleh sistem benar-benar termasuk dalam kategori mirip (relevan) menurut ground truth.
+
+2. Recall = TP / (TP + FN)
+
+   - FN (False Negative): jumlah pasangan buku yang sebenarnya mirip, tetapi tidak direkomendasikan oleh sistem
+
+   Recall mengukur proporsi item relevan yang berhasil ditemukan oleh sistem. Ini menunjukkan seberapa baik sistem dalam menangkap semua kemungkinan rekomendasi yang relevan.
+
+3. F1-Score = 2 * ((Precision * Recall) / (Precision + Recall))
+
+   F1-score adalah rata-rata harmonis dari precision dan recall. Metrik ini memberikan keseimbangan antara ketepatan sistem (precision) dan kelengkapan sistem (recall).
