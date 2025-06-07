@@ -70,7 +70,7 @@ Tautan dataset: https://www.kaggle.com/datasets/arashnic/book-recommendation-dat
    * Banyak Tahun Terbit:  202
    * Jumlah Penerbit:  16808
 3. Visualisasi bar chart top 10 author yang menunjukkan 10 pengarang dengan jumlah buku terbanyak
-![image alt](https://github.com/najwatdp/submission-sr/blob/c83a3e210f17c8e05b03eba3e9b5750c2d619110/top10_author.png)
+![Top 10 Author](images/top10_author.png)
    Berikut top 10 author:
    * Agatha Christie
    * William Shakespeare
@@ -153,24 +153,23 @@ Tidak melakukan eksplorasi data terhadap users.csv karena dalam content based fi
    Proses: Menggunakan pd.DataFrame untuk mebuat dataframe baru dari list yang sudah dibuat dan [:20000] untuk mengambil 20000 data pertama pada dataframe.
 
    Alasan: Untuk efisiensi pemrosesan dan pelatihan model. Dataset asli sangat besar, sehingga sampling dilakukan untuk mempercepat proses eksplorasi, pelatihan, dan evaluasi tanpa mengurangi representasi data secara signifikan.
+10. TF-IDF Vectorizer
 
-## Modeling dengan Content Based Filtering dan Result
-Sistem rekomendasi yang dikembangkan dalam proyek ini menggunakan pendekatan content-based filtering, yang berarti sistem menyarankan buku kepada pengguna berdasarkan kemiripan konten antar buku, bukan berdasarkan interaksi antar pengguna. Implementasi model dilakukan melalui tiga komponen utama, yaitu:
-1. TF-IDF Vectorizer
-   
-   TF-IDF (Term Frequency–Inverse Document Frequency) digunakan untuk mengubah fitur teks (dalam proyek ini: nama pengarang/'author') menjadi bentuk numerik (vektor). Setiap kata dalam nama pengarang akan dihitung bobotnya berdasarkan frekuensinya dalam satu buku dan seberapa umum kata tersebut muncul di keseluruhan data. Representasi vektor hasil TF-IDF ini digunakan untuk menghitung seberapa mirip dua buku berdasarkan penulisnya. Semakin mirip vektor dua buku, semakin besar kemungkinan sistem akan merekomendasikan salah satunya.
-   
-   Objek TfidfVectorizer dari pustaka Scikit-Learn diinisialisasi untuk memproses teks yang akan diubah menjadi representasi vektor. Objek ini bertanggung jawab melakukan tokenisasi, menghitung TF dan IDF, dan membentuk matriks TF-IDF. Kemudian dilakukan pelatihan awal (fit) pada data teks dari kolom author. Proses ini menghitung nilai IDF untuk setiap token (kata) unik dalam korpus Book-Author. Tujuannya adalah untuk mengetahui seberapa penting suatu kata dalam keseluruhan kumpulan data. Selanjutnya, ditampilkan daftar fitur atau kata unik yang dihasilkan dari proses tokenisasi Book-Author. Setiap kata akan menjadi kolom dalam matriks TF-IDF.
+    Proses: Objek TfidfVectorizer dari pustaka Scikit-Learn diinisialisasi untuk memproses teks yang akan diubah menjadi representasi vektor. Objek ini bertanggung jawab melakukan tokenisasi, menghitung TF dan IDF, dan membentuk matriks TF-IDF. Kemudian dilakukan pelatihan awal (fit) pada data teks dari kolom author. Proses ini menghitung nilai IDF untuk setiap token (kata) unik dalam korpus Book-Author. Tujuannya adalah untuk mengetahui seberapa penting suatu kata dalam keseluruhan kumpulan data. Selanjutnya, ditampilkan daftar fitur atau kata unik yang dihasilkan dari proses tokenisasi Book-Author. Setiap kata akan menjadi kolom dalam matriks TF-IDF.
 
    Setelah proses fit, data teks kemudian diubah menjadi bentuk matriks TF-IDF. Matriks ini memiliki dimensi (jumlah_buku × jumlah_kata_unik), di mana setiap sel berisi bobot TF-IDF dari kata tertentu untuk masing-masing buku (berdasarkan nama pengarang). Matriks TF-IDF hasil transformasi awal berbentuk sparse matrix. Untuk keperluan analisis atau visualisasi, sparse matrix diubah ke bentuk dense agar setiap elemen dapat ditampilkan secara eksplisit. Kemudian, dibuat dataframe agar lebih mudah dalam melakukan eksplorasi dan interpretasi terhadap matriks TF-IDF. Kolom diisi dengan penulis buku dan baris diisi dengan judul buku.
    
-2. Cosine Similarity
+    Alasan: TF-IDF (Term Frequency–Inverse Document Frequency) digunakan untuk mengubah fitur teks (dalam proyek ini: nama pengarang/'author') menjadi bentuk numerik (vektor). Setiap kata dalam nama pengarang akan dihitung bobotnya berdasarkan frekuensinya dalam satu buku dan seberapa umum kata tersebut muncul di keseluruhan data. Representasi vektor hasil TF-IDF ini digunakan untuk menghitung seberapa mirip dua buku berdasarkan penulisnya. Semakin mirip vektor dua buku, semakin besar kemungkinan sistem akan merekomendasikan salah satunya.
+
+## Modeling dengan Content Based Filtering dan Result
+Sistem rekomendasi yang dikembangkan dalam proyek ini menggunakan pendekatan content-based filtering, yang berarti sistem menyarankan buku kepada pengguna berdasarkan kemiripan konten antar buku, bukan berdasarkan interaksi antar pengguna. Implementasi model dilakukan melalui dua komponen utama, yaitu:
+1. Cosine Similarity
 
    Cosine similarity digunakan untuk mengukur tingkat kemiripan antara dua vektor TF-IDF. Nilai cosine similarity berkisar antara 0 (tidak mirip) hingga 1 (sangat mirip). Semakin tinggi nilainya, semakin mirip konten dua buku tersebut. Matriks cosine similarity menjadi dasar dalam menyusun daftar rekomendasi. Untuk setiap buku yang dipilih pengguna, sistem akan mengambil buku-buku lain dengan skor kemiripan tertinggi.
 
    Fungsi cosine_similarity dari sklearn.metrics.pairwise digunakan untuk menghitung nilai kemiripan antar semua pasangan buku berdasarkan vektor TF-IDF hasil representasi konten (dalam proyek ini menggunakan 'author). Nilai ini menjadi dasar untuk menyusun daftar buku yang mirip, sehingga dapat direkomendasikan kepada pengguna. Matriks hasil cosine similarity dikonversi menjadi DataFrame untuk mempermudah akses dan manipulasi data. Baris dan kolom dari DataFrame diisi dengan nama judul buku (book_title) dan nilai antar sel menunjukkan tingkat kemiripan antara dua buku tertentu.
    
-3. Mendapatkan Rekomendasi
+2. Mendapatkan Rekomendasi
 
    Setelah matriks kemiripan antar buku berhasil dibentuk menggunakan pendekatan cosine similarity, langkah selanjutnya dalam sistem rekomendasi adalah menghasilkan daftar buku yang paling mirip dengan buku tertentu yang dijadikan input oleh pengguna. Untuk itu, sistem menggunakan fungsi book_recommendation(), yang bekerja berdasarkan perhitungan skor kemiripan konten antar buku. Fungsi ini menerima input berupa judul buku dan akan mengembalikan beberapa rekomendasi buku lain yang paling mirip.
 
